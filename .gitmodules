@@ -1,0 +1,21 @@
+[submodule "busybear-linux"]
+	path = busybear-linux
+	url = https://github.com/michaeljclark/busybear-linux
+[submodule "riscv-linux"]
+	path = riscv-linux
+	url = https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+[submodule "riscv-pk"]
+	path = riscv-pk
+	url = https://github.com/riscv/riscv-pk.git
+[submodule "xen"]
+	path = xen
+	url = git@github.com:alistair23/xen.git
+[submodule "opensbi"]
+	path = opensbi
+	url = git@github.com:riscv/opensbi.git
+[submodule "mydev"]
+	path = mydev
+	url = git@github.com:beshleman/mydev.git
+[submodule "qemu"]
+	path = qemu
+	url = git@github.com:alistair23/qemu.git

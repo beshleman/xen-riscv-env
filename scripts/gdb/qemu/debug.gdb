@@ -1,0 +1,1 @@
+r -nographic -s -S -machine virt -cpu rv64,x-h=true -serial mon:stdio -serial null -m 4G -monitor telnet::45454,server,nowait  -device loader,file=/home/bobbye/projects/xen-on-riscv/xen/xen/xen,addr=0x80200000 -kernel /home/bobbye/projects/xen-on-riscv/opensbi/build/platform/qemu/virt/firmware/fw_jump.elf
