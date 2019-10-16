@@ -13,3 +13,10 @@ qemu:
 
 clean:
 	make clean -C $(PWD)/opensbi
+
+build:
+scripts/opensbi-jump.sh build
+
+run:
+scripts/opensbi-jump.sh
+
