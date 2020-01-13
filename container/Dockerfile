@@ -9,6 +9,8 @@ RUN git clone --recursive https://github.com/riscv/riscv-gnu-toolchain && \
     make linux -j8 && \
     rm -R /riscv-gnu-toolchain/
 
+ENV PATH=/opt/riscv/bin/:${PATH}
+
 # Setup QEMU
 RUN cd /opt/ && \
 	git clone --single-branch --branch mainline/alistair/riscv-hyp-ext-v0.5.next https://github.com/alistair23/qemu.git && \
@@ -68,3 +70,4 @@ RUN pacman --noconfirm -Sy iputils net-tools
 RUN pacman --noconfirm -Sy tmux
 
 WORKDIR /home/
+
