@@ -2,6 +2,13 @@ FROM archlinux/base
 
 RUN pacman --noconfirm -Syu git base-devel python pixman gcc
 
+# RISC-V toolchain
+RUN git clone --recursive https://github.com/riscv/riscv-gnu-toolchain && \
+    cd riscv-gnu-toolchain/ && \
+    ./configure --prefix=/opt/riscv && \
+    make linux -j8 && \
+    rm -R /riscv-gnu-toolchain/
+
 # Setup QEMU
 RUN cd /opt/ && \
 	git clone --single-branch --branch mainline/alistair/riscv-hyp-ext-v0.5.next https://github.com/alistair23/qemu.git && \
@@ -54,27 +61,10 @@ RUN cd /opt/ && \
 	make -j$(nproc) && make install && \
 	qemu-system-riscv64 --version
 
-# Setup riscv tools
-RUN pacman --noconfirm -Sy riscv64-linux-gnu-gcc riscv64-linux-gnu-gdb riscv64-linux-gnu-binutils
-
 # ifconfig and ping
 RUN pacman --noconfirm -Sy iputils net-tools
 
 # tmux
 RUN pacman --noconfirm -Sy tmux
 
-RUN mkdir -p /srv/git/
-RUN mkdir -p /srv/git/scripts/
-
-COPY build.sh /srv/git/scripts/build.sh
-RUN chmod +x /srv/git/scripts/build.sh
-
-COPY run.sh /srv/git/scripts/run.sh
-RUN chmod +x /srv/git/scripts/run.sh
-
-COPY gdb.sh /srv/git/scripts/gdb.sh
-RUN chmod +x /srv/git/scripts/gdb.sh
-
-COPY Makefile /srv/git/Makefile
-
-WORKDIR /srv/git
+WORKDIR /home/
