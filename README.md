@@ -1,6 +1,6 @@
 # Debugging
 
-To OpenSBI and Xen with QEMU run:
+To run OpenSBI and Xen with QEMU:
 
 ```bash
 $ ./run.sh
