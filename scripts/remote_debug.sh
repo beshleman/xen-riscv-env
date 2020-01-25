@@ -1,6 +1,4 @@
-#!/bin/env bash
-
-export PATH=/opt/riscv/bin:${PATH}
+#!/usr/bin/env bash
 
 riscv64-unknown-linux-gnu-gdb \
 	-ex "target remote 172.19.0.2:1234" \
