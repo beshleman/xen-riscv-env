@@ -1,3 +1,14 @@
-#!/bin/bash
+#!/bin/env bash
 
-qemu-system-riscv64 -s -S -cpu rv64,x-h=true -M virt -m 512M -display none -serial stdio -kernel opensbi/build/platform/qemu/virt/firmware/fw_payload.elf
+set -eu
+
+if ! docker network ls | grep -q my-net; then
+	docker network create my-net --subnet 172.19.0.0/24
+fi
+
+docker run --ip 172.19.0.2 \
+	--publish 1234 \
+	--network my-net \
+	-v $(readlink -e .):/home/ \
+	-it petebob/riscv:$(make --no-print-directory -C container version) \
+		./scripts/run_qemu.sh
