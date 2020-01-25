@@ -1,15 +1,20 @@
 FROM archlinux/base
 
-RUN pacman --noconfirm -Syu git base-devel python pixman gcc
+# Packages needed for the build
+RUN pacman --noconfirm -Syu \
+    base-devel \
+    gcc \
+    git \
+    pixman \
+    python \
+    sh
 
 # RISC-V toolchain
-RUN git clone --recursive https://github.com/riscv/riscv-gnu-toolchain && \
+RUN git clone --recursive -j$(nproc) --progress https://github.com/riscv/riscv-gnu-toolchain && \
     cd riscv-gnu-toolchain/ && \
     ./configure --prefix=/opt/riscv && \
-    make linux -j8 && \
-    rm -R /riscv-gnu-toolchain/
-
-ENV PATH=/opt/riscv/bin/:${PATH}
+    make linux -j$(nproc) && \
+    rm -R /riscv-gnu-toolchain
 
 # Setup QEMU
 RUN cd /opt/ && \
@@ -61,13 +66,15 @@ RUN cd /opt/ && \
 			--disable-vhost-net \
 			--disable-vhost-vsock && \
 	make -j$(nproc) && make install && \
+    cd /opt && rm -r qemu && \
 	qemu-system-riscv64 --version
 
-# ifconfig and ping
-RUN pacman --noconfirm -Sy iputils net-tools
+RUN pacman --noconfirm -Sy \
+    iputils \
+    net-tools \
+    tmux \
+    vim
 
-# tmux
-RUN pacman --noconfirm -Sy tmux
-
-WORKDIR /home/
-
+ENV PATH=/opt/riscv/bin/:${PATH}
+WORKDIR /home
+SHELL [ "/bin/bash -c" ]
