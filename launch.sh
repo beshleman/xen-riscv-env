@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eu
 
 if ! docker network ls | grep -q my-net; then
 	docker network create my-net --subnet 172.19.0.0/24
@@ -10,4 +10,4 @@ docker run --ip 172.19.0.2 \
 	--publish 1234 \
 	--network my-net \
 	-v $(readlink -e .):/home/ \
-	-it petebob/riscv bash
+	-it petebob/riscv:$(make --no-print-directory -C container version) bash
