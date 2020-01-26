@@ -1,3 +1,5 @@
 #!/bin/bash
 
-qemu-system-riscv64 -s -S -cpu rv64,x-h=true -M virt -m 512M -display none -serial stdio -kernel opensbi/build/platform/qemu/virt/firmware/fw_payload.elf
+set -eu
+
+./scripts/run_docker_net.sh 172.19.0.2 ./scripts/run_qemu.sh
