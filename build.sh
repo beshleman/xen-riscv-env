@@ -3,7 +3,8 @@
 set -e
 
 pushd xen/xen
-XEN_TARGET_ARCH=riscv64 CROSS_COMPILE=riscv64-unknown-linux-gnu- make build -j8
+XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 make defconfig
+XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 CROSS_COMPILE=riscv64-unknown-linux-gnu- make build -j8
 popd
 
 pushd opensbi
