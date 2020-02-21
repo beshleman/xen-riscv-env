@@ -51,7 +51,6 @@ RUN cd /opt/ && \
         --disable-brlapi \
         --disable-curl \
         --disable-membarrier \
-        --disable-bluez \
         --disable-kvm \
         --disable-hax \
         --disable-hvf \

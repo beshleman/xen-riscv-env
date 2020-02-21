@@ -1,4 +1,4 @@
-VERSION := 1
+VERSION := 2
 
 all:
 	docker build . -t petebob/riscv:$(VERSION)
