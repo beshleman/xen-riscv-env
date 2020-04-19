@@ -1,5 +1,4 @@
-DOCKER_IMAGE_VER := 3
-DOCKER_IMAGE_TAG := petebob/riscv:$(DOCKER_IMAGE_VER)
+DOCKER_IMAGE_TAG := registry.gitlab.com/bobbyeshleman/xen/archlinux:riscv
 
 vol_mnt    = -v $(1):$(1)
 vol_mnt_ro = $(call vol_mnt,$(1)):ro
@@ -18,15 +17,17 @@ DOCKER_ARGS += $(DOCKER_IMAGE_TAG)
 OPENSBI_REV := 6ffe1bed09be1cb2db8755b30c0258849184400b
 CLONED_DEPS := xen/.cloned opensbi/.cloned
 
+export CC=gcc
+export XEN_TARGET_ARCH=riscv64
+
 .PHONY: all
 all: $(CLONED_DEPS)
-	$(MAKE) -C xen/xen XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 defconfig
-	$(MAKE) -C xen/xen XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 CROSS_COMPILE=riscv64-unknown-linux-gnu- build -j$$(nproc)
+	cd xen && automation/scripts/build
 	$(MAKE) -C opensbi CROSS_COMPILE=riscv64-unknown-linux-gnu- PLATFORM=qemu/virt FW_PAYLOAD_PATH=../xen/xen/xen -j$$(nproc)
 
 .PHONY: run
 run:
-	./scripts/run_docker_net.sh 172.19.0.2 ./scripts/run_qemu.sh $(DOCKER_IMAGE_VER)
+	scripts/run_docker_net.sh 172.19.0.2 scripts/run_qemu.sh "$(DOCKER_IMAGE_TAG)"
 
 .PHONY: fetch
 fetch: $(CLONED_DEPS)
@@ -52,7 +53,7 @@ opensbi/.cloned:
 
 .PHONY: docker-shell
 docker-shell:
-	docker run -ti $(DOCKER_ARGS) /bin/bash
+	scripts/run_docker_net.sh 172.19.0.2  /bin/bash $(DOCKER_IMAGE_TAG)
 
 .PHONY: docker-build
 docker-build:
