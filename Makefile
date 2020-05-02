@@ -15,7 +15,7 @@ endif
 DOCKER_ARGS += $(DOCKER_IMAGE_TAG)
 
 OPENSBI_REV := 6ffe1bed09be1cb2db8755b30c0258849184400b
-CLONED_DEPS := xen/.cloned opensbi/.cloned
+CLONED_DEPS := xen/.cloned opensbi/.cloned linux/.cloned
 
 export CC=gcc
 export XEN_TARGET_ARCH=riscv64
@@ -24,6 +24,7 @@ export XEN_TARGET_ARCH=riscv64
 all: $(CLONED_DEPS)
 	cd xen && automation/scripts/build
 	$(MAKE) -C opensbi CROSS_COMPILE=riscv64-unknown-linux-gnu- PLATFORM=qemu/virt FW_PAYLOAD_PATH=../xen/xen/xen -j$$(nproc)
+	$(MAKE) -C linux CROSS_COMPILE=riscv64-unknown-linux-gnu- ARCH=riscv64-j$$(nproc)
 
 .PHONY: run
 run:
@@ -49,6 +50,10 @@ xen/.cloned:
 opensbi/.cloned:
 	git clone https://github.com/riscv/opensbi.git
 	cd opensbi && git reset --hard $(OPENSBI_REV)
+	touch $@
+
+linux/.cloned:
+	git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 	touch $@
 
 .PHONY: docker-shell
