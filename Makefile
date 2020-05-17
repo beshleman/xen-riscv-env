@@ -1,4 +1,4 @@
-DOCKER_IMAGE_TAG := registry.gitlab.com/bobbyeshleman/xen/archlinux:riscv
+DOCKER_IMAGE_TAG := xen-riscv-env:latest
 
 vol_mnt    = -v $(1):$(1)
 vol_mnt_ro = $(call vol_mnt,$(1)):ro
@@ -17,14 +17,15 @@ DOCKER_ARGS += $(DOCKER_IMAGE_TAG)
 OPENSBI_REV := 6ffe1bed09be1cb2db8755b30c0258849184400b
 CLONED_DEPS := xen/.cloned opensbi/.cloned linux/.cloned
 
-export CC=gcc
-export XEN_TARGET_ARCH=riscv64
-
 .PHONY: all
-all: $(CLONED_DEPS)
-	cd xen && automation/scripts/build
+all: $(CLONED_DEPS) linux/vmlinux
+	XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -C xen/xen riscv64_defconfig
+	XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -C xen/xen build -j8
 	$(MAKE) -C opensbi CROSS_COMPILE=riscv64-unknown-linux-gnu- PLATFORM=qemu/virt FW_PAYLOAD_PATH=../xen/xen/xen -j$$(nproc)
-	$(MAKE) -C linux CROSS_COMPILE=riscv64-unknown-linux-gnu- ARCH=riscv64-j$$(nproc)
+
+linux/vmlinux:
+	$(MAKE) -C linux ARCH=riscv defconfig
+	$(MAKE) -C linux CROSS_COMPILE=riscv64-unknown-linux-gnu- ARCH=riscv -j$$(nproc)
 
 .PHONY: run
 run:
@@ -35,8 +36,8 @@ fetch: $(CLONED_DEPS)
 
 .PHONY: clean
 clean:
-	$(if $(wildcard xen/xen),$(MAKE) -C xen/xen clean)
-	$(if $(wildcard opensbi),$(MAKE) -C opensbi clean)
+	$(if $(wildcard xen/xen),$(MAKE) -C xen/xen clean -j$$(nproc))
+	$(if $(wildcard opensbi),$(MAKE) -C opensbi clean -j$$(nproc))
 
 .PHONY: cleanall
 cleanall:
@@ -53,7 +54,9 @@ opensbi/.cloned:
 	touch $@
 
 linux/.cloned:
-	git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+	wget https://git.kernel.org/torvalds/t/linux-5.7-rc5.tar.gz
+	tar xvf linux-5.7-rc5.tar.gz
+	mv linux-5.7-rc5.tar.gz linux
 	touch $@
 
 .PHONY: docker-shell
