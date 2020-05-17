@@ -7,5 +7,5 @@ riscv64-unknown-linux-gnu-gdb \
 	-ex "add-symbol-file xen/xen/xen-syms ${XEN_START_ADDRESS}" \
 	-ex "hb *${XEN_START_ADDRESS}" \
 	-ex "file xen/xen/xen-syms" \
-    -ex "dir xen/xen/arch/riscv" \
+        -ex "dir xen/xen/arch/riscv" \
 	-ex "c"
