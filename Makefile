@@ -45,7 +45,7 @@ cleanall:
 	$(RM) -r xen opensbi
 
 xen/.cloned:
-	git clone git@github.com:beshleman/xen.git
+	git clone git@gitlab.com:bobbyeshleman/xen.git
 	cd xen && git checkout port-to-risc-v
 	touch $@
 
