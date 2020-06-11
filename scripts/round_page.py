@@ -2,12 +2,13 @@
 
 import sys
 
-ENTRY = 0x80000000
-PAGE_SIZE = (4<<10)
+ENTRY = 0x80200000
+PAGE_OFFSET = 12
+PAGE_SIZE = (1<<PAGE_OFFSET)
+PAGE_MASK = (PAGE_SIZE - 1)
 
 def round_page(addr):
-    pages = addr // PAGE_SIZE
-    return (pages + 1) * PAGE_SIZE
+    return (addr & ~PAGE_MASK) + PAGE_SIZE
 
 if __name__ == '__main__':
     xenend = int(sys.argv[1], base=16) + PAGE_SIZE + ENTRY
