@@ -11,6 +11,10 @@ $ make fetch
 2. Build Docker Image
 
 ```
+# First build the "upstream" image
+$ make docker-build-upstream
+
+# Then build the "downstream" image
 $ make docker-build
 ```
 
