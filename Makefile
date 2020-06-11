@@ -1,4 +1,5 @@
 DOCKER_IMAGE_TAG := xen-riscv-env:latest
+DOCKER_UPSTREAM_IMAGE_TAG := registry.gitlab.com/bobbyeshleman/xen/archlinux
 
 vol_mnt    = -v $(1):$(1)
 vol_mnt_ro = $(call vol_mnt,$(1)):ro
@@ -66,6 +67,10 @@ docker-shell:
 .PHONY: docker-build
 docker-build:
 	docker build . --tag $(DOCKER_IMAGE_TAG)
+
+.PHONY: docker-build-upstream
+docker-build-upstream:
+	docker build xen/automation/build/archlinux/ --tag $(DOCKER_UPSTREAM_IMAGE_TAG) -f xen/automation/build/archlinux/riscv64.dockerfile
 
 .PHONY: docker-publish
 docker-publish:
