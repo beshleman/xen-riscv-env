@@ -1,31 +1,27 @@
-# Build Notes
+# The Container Environment for Xen on RISC-V Development
 
-## KConfig: Minimal Build
+## Setup
 
-A minimal build consists of:
-	CONFIG_GRANT_TABLE=n
+1. Fetch Dependencies
 
-Building with `CONFIG_GRANT_TABLE=n` requires the use of the
-`XEN_CONFIG_EXPERT=y` environment variable being set. 
-
-The riscv defconfigs are the "minimal" build by default.
-
-# Debugging
-# Xen Port Tooling
-
-This repo offers Dockerfiles and scripts for building Xen, QEMU, the bootloader, the toolchain, etc...
-
-# Usage
-
-
-To run OpenSBI and Xen with QEMU:
-
-```bash
-$ ./run.sh
+```
+$ make fetch
 ```
 
-This halts waiting for GDB to connect.  To connect gdb:
+2. Build Docker Image
 
-```bash
-$ ./debug.sh
+```
+$ make docker-build
+```
+
+## Build
+
+```
+$ make docker-all
+```
+
+## Run
+
+```
+$ make run
 ```
