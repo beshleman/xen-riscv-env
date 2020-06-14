@@ -69,7 +69,7 @@ opensbi/.cloned:
 linux/.cloned:
 	wget https://git.kernel.org/torvalds/t/linux-5.7-rc5.tar.gz
 	tar xvf linux-5.7-rc5.tar.gz
-	mv linux-5.7-rc5.tar.gz linux
+	mv linux-5.7-rc5 linux
 	touch $@
 
 .PHONY: docker-shell
