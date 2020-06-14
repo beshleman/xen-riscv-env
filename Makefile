@@ -58,7 +58,7 @@ cleanall:
 
 xen/.cloned:
 	git clone https://gitlab.com/bobbyeshleman/xen.git
-	cd xen && git checkout port-to-risc-v
+	cd xen && git checkout riscv
 	touch $@
 
 opensbi/.cloned:
