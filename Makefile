@@ -22,6 +22,8 @@ CROSS_COMPILE := riscv64-unknown-linux-gnu-
 
 FW_PATH := opensbi/build/platform/qemu/virt/firmware/fw_payload.elf
 
+XEN_SRC := $(shell find xen/ -name '*.[ch]')
+
 .PHONY: all
 all: $(CLONED_DEPS) linux/vmlinux $(FW_PATH)
 	$(MAKE) -C opensbi CROSS_COMPILE=$(CROSS_COMPILE) \
@@ -30,7 +32,7 @@ all: $(CLONED_DEPS) linux/vmlinux $(FW_PATH)
 $(FW_PATH): xen/xen/xen
 	$(MAKE) -C opensbi CROSS_COMPILE=riscv64-unknown-linux-gnu- PLATFORM=qemu/virt FW_PAYLOAD_PATH=../$< -j$$(nproc)
 
-xen/xen/xen:
+xen/xen/xen: $(XEN_SRC)
 	XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 \
 		CROSS_COMPILE=$(CROSS_COMPILE) $(MAKE) -C xen/xen riscv64_defconfig
 	XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 \
