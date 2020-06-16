@@ -9,9 +9,9 @@ RUN pacman --noconfirm -Syu \
 # Setup QEMU
  RUN qemu-system-riscv64 --version || \
      (cd /opt/ && \
-     git clone --single-branch --branch mainline/alistair/riscv-hyp-ext-v0.5.next https://github.com/alistair23/qemu.git && \
+     git clone --single-branch --branch mainline/anup/riscv-hyp-ext-v0.6.1 https://github.com/kvm-riscv/qemu.git && \
      cd qemu && \
-     mkdir build && \
+     mkdir -p build && \
      cd build && \
      ../configure --target-list=riscv64-softmmu \
          --disable-docs \
