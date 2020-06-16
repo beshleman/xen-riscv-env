@@ -27,6 +27,16 @@ $ make docker-all
 $ make run
 ```
 
+## Debug
+
+Call `make run` in one terminal session.
+
+In another window:
+
+```bash
+$ make debug
+```
+
 ## Build Docker Image
 
 ```
