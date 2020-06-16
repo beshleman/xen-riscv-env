@@ -1,4 +1,4 @@
-DOCKER_IMAGE_TAG := xen-riscv-env:latest
+DOCKER_IMAGE_TAG := beshleman/xen-riscv-env:v1
 DOCKER_UPSTREAM_IMAGE_TAG := registry.gitlab.com/bobbyeshleman/xen/archlinux:riscv
 
 vol_mnt    = -v $(1):$(1)
@@ -89,6 +89,10 @@ docker-build-upstream:
 .PHONY: docker-publish
 docker-publish:
 	docker push $(DOCKER_IMAGE_TAG)
+
+.PHONY: docker-pull
+docker-pull:
+	docker pull $(DOCKER_IMAGE_TAG)
 
 docker-%: Dockerfile
 	docker run $(DOCKER_ARGS) $(notdir $(MAKE)) $* $(MAKEFLAGS)
