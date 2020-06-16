@@ -28,4 +28,4 @@ qemu-system-riscv64 \
 	-M virt -m 512M -display none \
 	-serial stdio \
 	-device loader,file=$(readlink -e ${DOM0_KERNEL}),addr=${DOM0_KERNEL_LOAD_ADDR} \
-	-kernel "$(readlink -e ${OPENSBI})" #-machine dumpdtb=riscv64-qemu-virt.dtb #-s -S
+	-kernel "$(readlink -e ${OPENSBI})" -s -S #-machine dumpdtb=riscv64-qemu-virt.dtb
