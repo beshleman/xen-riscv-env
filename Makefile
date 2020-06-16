@@ -1,5 +1,5 @@
 DOCKER_IMAGE_TAG := xen-riscv-env:latest
-DOCKER_UPSTREAM_IMAGE_TAG := registry.gitlab.com/bobbyeshleman/xen/archlinux
+DOCKER_UPSTREAM_IMAGE_TAG := registry.gitlab.com/bobbyeshleman/xen/archlinux:riscv
 
 vol_mnt    = -v $(1):$(1)
 vol_mnt_ro = $(call vol_mnt,$(1)):ro
