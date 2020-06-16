@@ -4,11 +4,30 @@
 
 1. Fetch Dependencies
 
-```
+```bash
 $ make fetch
 ```
 
-2. Build Docker Image
+2. Pull Docker image
+
+```bash
+$ make docker-pull
+```
+
+
+## Build
+
+```bash
+$ make docker-all
+```
+
+## Run
+
+```bash
+$ make run
+```
+
+## Build Docker Image
 
 ```
 # First build the "upstream" image
@@ -16,16 +35,4 @@ $ make docker-build-upstream
 
 # Then build the "downstream" image
 $ make docker-build
-```
-
-## Build
-
-```
-$ make docker-all
-```
-
-## Run
-
-```
-$ make run
 ```
