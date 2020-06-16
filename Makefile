@@ -46,6 +46,10 @@ linux/vmlinux:
 run:
 	scripts/run_docker_net.sh 172.19.0.2 scripts/run_qemu.sh "$(DOCKER_IMAGE_TAG)"
 
+.PHONY: debug
+debug:
+	./debug.sh
+
 .PHONY: fetch
 fetch: $(CLONED_DEPS)
 
