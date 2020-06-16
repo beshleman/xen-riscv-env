@@ -48,7 +48,7 @@ run:
 
 .PHONY: debug
 debug:
-	./debug.sh
+	./debug.sh $(DOCKER_IMAGE_TAG)
 
 .PHONY: fetch
 fetch: $(CLONED_DEPS)
