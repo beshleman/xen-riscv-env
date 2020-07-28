@@ -8,4 +8,4 @@ riscv64-unknown-linux-gnu-gdb \
 	-ex "hb *${XEN_START_ADDRESS}" \
 	-ex "file xen/xen/xen-syms" \
 	-ex "dir xen/xen/arch/riscv" \
-	-ex "c"
+	-ex "source mygdbscript.scr"

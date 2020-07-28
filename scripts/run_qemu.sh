@@ -4,11 +4,11 @@ set -e
 
 SETUP_FILE=xen/xen/arch/riscv/setup.c
 
+FLASH2=0x22000000
 DOM0_KERNEL=linux/arch/riscv/boot/Image
 OPENSBI=opensbi/build/platform/qemu/virt/firmware/fw_payload.elf
-
 XEN_OPENSBI_SZ=0x$(printf "%x" $(wc -c ${OPENSBI} | cut -d ' ' -f 1))
-DOM0_KERNEL_LOAD_ADDR=$(scripts/round_page.py ${XEN_OPENSBI_SZ})
+DOM0_KERNEL_LOAD_ADDR=${FLASH2}
 XEN_EXPECTED_DOM0_LOAD_ADDR=$(cat -n ${SETUP_FILE} | grep DOM0_KERNEL\ 0x)
 
 [[ ! "${XEN_EXPECTED_DOM0_LOAD_ADDR}" =~ "${DOM0_KERNEL_LOAD_ADDR}" ]] && {
