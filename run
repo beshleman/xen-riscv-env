@@ -5,9 +5,9 @@ set -x
 
 kernel=linux/arch/riscv/boot/Image.gz
 kernel_size=$(cat ${kernel} | wc -c)
+uboot=u-boot/u-boot
 opensbi=opensbi/build/platform/generic/firmware/fw_jump.elf
-xen=xen/xen/xen
-dtb=dtbs/riscv64-guest.dtb
+bootscr=./disk/boot.scr
 
 page_up() {
     local out
@@ -21,13 +21,11 @@ page_up() {
 
 kernel_start=0x80400000
 kernel_end=$((${kernel_start} + ${kernel_size}))
-dtb_start=$(page_up ${kernel_end})
-dtb_size=$(cat ${dtb} | wc -c)
-dtb_end=$((${dtb_start} + ${dtb_size}))
 
 printf "\nLaunching qemu-system-riscv64 with Boot Modules:\n"
 printf "\tKernel: 0x%02x -> 0x%02x\n" ${DOM0_KERNEL} ${kernel_end}
-printf "\tDTB:    0x%02x -> 0x%02x\n" ${dtb_start} ${dtb_end}
+
+./scripts/create_disk.sh
 
 qemu-system-riscv64 \
 	-cpu rv64,x-h=true \
@@ -35,8 +33,10 @@ qemu-system-riscv64 \
     -smp 1 \
 	-serial stdio \
     -monitor telnet::45454,server,nowait  \
-	-device loader,file=$(readlink -e ${kernel}),addr=${kernel_start} \
-	-device loader,file=$(readlink -e ${dtb}),addr=${dtb_start} \
-	-device loader,file=$(readlink -e ${xen}),addr=0x80200000 \
-	-bios "$(readlink -e ${opensbi})" \
+	-kernel ./u-boot/u-boot \
+	-bios opensbi/build/platform/generic/firmware/fw_jump.elf \
+	-device loader,file=${bootscr},addr=0x80a00000 \
+    -device ich9-ahci,id=ahci \
+    -drive if=none,file=./disk.img,format=raw,id=mydisk \
+    -device ide-hd,drive=mydisk,bus=ahci.0 \
     -d in_asm -D qemu_log.txt -s -S # -machine dumpdtb=riscv64-qemu-virt.dtb

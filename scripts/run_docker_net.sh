@@ -13,5 +13,6 @@ fi
 docker run --ip ${IP} \
 	--publish 1234 \
 	--network my-net \
-        -v $(pwd):/build/ \
+        -v $(pwd):$(pwd) \
+        -w $(pwd)        \
 	-it ${DOCKER_IMAGE_TAG} ${ENTRY}

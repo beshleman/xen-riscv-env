@@ -1,3 +1,8 @@
 xen/
 opensbi/
 linux/
+u-boot
+u-boot-*/
+qemu_log.txt
+disk/
+disk.img

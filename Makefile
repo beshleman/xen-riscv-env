@@ -1,5 +1,5 @@
 DOCKER_IMAGE_TAG := beshleman/xen-riscv-env:v1
-DOCKER_UPSTREAM_IMAGE_TAG := registry.gitlab.com/bobbyeshleman/xen/archlinux:riscv
+DOCKER_UPSTREAM_IMAGE_TAG := registry.gitlab.com/xen-on-risc-v/xen/archlinux
 
 vol_mnt    = -v $(1):$(1)
 vol_mnt_ro = $(call vol_mnt,$(1)):ro
@@ -11,36 +11,38 @@ ifeq ($(ROOT),)
     DOCKER_ARGS += -u $(shell id -u):$(shell id -g)
     DOCKER_ARGS += $(call vol_mnt_ro,$(HOME)/.ssh)
 else
-    DOCKER_ARGS += -v $(HOME)/.ssh:/root/.ssh
+	DOCKER_ARGS += -v $(HOME)/.ssh:/root/.ssh
 endif
 DOCKER_ARGS += $(DOCKER_IMAGE_TAG)
 
 OPENSBI_REV := 6ffe1bed09be1cb2db8755b30c0258849184400b
-CLONED_DEPS := xen/.cloned opensbi/.cloned linux/.cloned
+CLONED_DEPS := xen/.cloned opensbi/.cloned linux/.cloned u-boot/.cloned
 
-CROSS_COMPILE := riscv64-unknown-linux-gnu-
-
-FW_PATH := opensbi/build/platform/qemu/virt/firmware/fw_payload.elf
-
-XEN_SRC := $(shell find xen/ -name '*.[ch]')
+CROSS_COMPILE := riscv64-linux-gnu-
 
 .PHONY: all
-all: $(CLONED_DEPS) linux/vmlinux $(FW_PATH)
+all: $(CLONED_DEPS) linux/vmlinux opensbi xen/xen/xen
 	$(MAKE) -C opensbi CROSS_COMPILE=$(CROSS_COMPILE) \
-		PLATFORM=qemu/virt FW_PAYLOAD_PATH=../xen/xen/xen -j$$(nproc)
+		PLATFORM=generic FW_PAYLOAD_PATH=../xen/xen/xen -j$$(nproc)
 
-$(FW_PATH): xen/xen/xen
-	$(MAKE) -C opensbi CROSS_COMPILE=riscv64-unknown-linux-gnu- PLATFORM=qemu/virt FW_PAYLOAD_PATH=../$< -j$$(nproc)
+.PHONY: opensbi
+opensbi:
+	$(MAKE) -C opensbi CROSS_COMPILE=riscv64-linux-gnu- PLATFORM=generic -j$$(nproc)
 
-xen/xen/xen: $(XEN_SRC)
+.PHONY: xen/xen/xen
+xen/xen/xen:
 	XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 \
 		CROSS_COMPILE=$(CROSS_COMPILE) $(MAKE) -C xen/xen riscv64_defconfig
 	XEN_CONFIG_EXPERT=y XEN_TARGET_ARCH=riscv64 \
 		CROSS_COMPILE=$(CROSS_COMPILE) $(MAKE) -C xen/xen build -j8
 
 linux/vmlinux:
-	$(MAKE) -C linux ARCH=riscv defconfig
-	$(MAKE) -C linux CROSS_COMPILE=riscv64-unknown-linux-gnu- ARCH=riscv -j$$(nproc)
+	cp kernel_config linux/.config
+	$(MAKE) -C linux CROSS_COMPILE=riscv64-linux-gnu- ARCH=riscv -j$$(nproc)
+
+u-boot/u-boot:
+	make qemu-riscv64_smode_defconfig -C ./u-boot
+	ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- make -j8 -C ./u-boot
 
 .PHONY: run
 run:
@@ -49,6 +51,10 @@ run:
 .PHONY: debug
 debug:
 	./debug.sh $(DOCKER_IMAGE_TAG)
+
+.PHONY: monitor
+monitor:
+	telnet 172.19.0.2 45454
 
 .PHONY: fetch
 fetch: $(CLONED_DEPS)
@@ -78,13 +84,21 @@ linux/.cloned:
 	mv linux-5.7-rc5 linux
 	touch $@
 
+u-boot/.cloned:
+	wget https://github.com/u-boot/u-boot/archive/refs/tags/v2021.10.tar.gz
+	tar xvf v2021.10.tar.gz
+	ln -sf u-boot-2021.10 u-boot
+	touch $@
+
 .PHONY: docker-shell
 docker-shell:
-	scripts/run_docker_net.sh 172.19.0.2  /bin/bash $(DOCKER_IMAGE_TAG)
+	scripts/run_docker_net.sh 172.19.0.2  /bin/bash $(DOCKER_IMAGE_TAG) $(DOCKER_ARGS)
 
 .PHONY: docker-build
 docker-build:
-	docker build . --tag $(DOCKER_IMAGE_TAG)
+	$(eval BUILDDIR := $(shell mktemp -d))
+	docker build $(BUILDDIR) -f Dockerfile --tag $(DOCKER_IMAGE_TAG)
+	rm -fr $(BUILDDIR)
 
 .PHONY: docker-build-upstream
 docker-build-upstream:
@@ -98,7 +112,7 @@ docker-publish:
 docker-pull:
 	docker pull $(DOCKER_IMAGE_TAG)
 
-docker-%: Dockerfile
+docker-%:
 	docker run $(DOCKER_ARGS) $(notdir $(MAKE)) $* $(MAKEFLAGS)
 
 print-%:

@@ -1,63 +1,14 @@
-FROM registry.gitlab.com/bobbyeshleman/xen/archlinux:riscv
+FROM archlinux:latest
 
-USER root
+RUN pacman --noconfirm -Syu
 
 # Packages needed for building the kernel
-RUN pacman --noconfirm -Syu \
+RUN pacman --noconfirm -Sy \
     xmlto kmod inetutils bc libelf
 
 # Setup QEMU
- RUN qemu-system-riscv64 --version || \
-     (cd /opt/ && \
-     git clone --single-branch --branch mainline/anup/riscv-hyp-ext-v0.6.1 https://github.com/kvm-riscv/qemu.git && \
-     cd qemu && \
-     mkdir -p build && \
-     cd build && \
-     ../configure --target-list=riscv64-softmmu \
-         --disable-docs \
-         --disable-guest-agent \
-         --disable-guest-agent-msi \
-         --disable-pie \
-         --disable-modules \
-         --disable-sparse \
-         --disable-gnutls \
-         --disable-nettle \
-         --disable-gcrypt \
-         --disable-auth-pam \
-         --disable-sdl \
-         --disable-sdl-image \
-         --disable-gtk \
-         --disable-vte \
-         --disable-curses \
-         --disable-iconv \
-         --disable-vnc \
-         --disable-vnc-sasl \
-         --disable-vnc-jpeg \
-         --disable-vnc-png \
-         --disable-cocoa \
-         --disable-virtfs \
-         --disable-mpath \
-         --disable-xen \
-         --disable-xen-pci-passthrough \
-         --disable-brlapi \
-         --disable-curl \
-         --disable-membarrier \
-         --disable-kvm \
-         --disable-hax \
-         --disable-hvf \
-         --disable-whpx \
-         --disable-rdma \
-         --disable-pvrdma \
-         --disable-vde \
-         --disable-netmap \
-         --disable-linux-aio \
-         --disable-cap-ng \
-         --disable-attr \
-         --disable-vhost-net \
-         --disable-vhost-vsock && \
-     make -j$(nproc) && make install && \
-     cd /opt && rm -r qemu) && \
-     qemu-system-riscv64 --version
+RUN pacman --noconfirm -Sy \
+    qemu-arch-extra
  
 RUN pacman --noconfirm -Sy \
     iputils \
@@ -65,6 +16,18 @@ RUN pacman --noconfirm -Sy \
     openssh \
     tmux \
     vim
+
+RUN pacman --noconfirm -Sy \
+    riscv64-linux-gnu-gdb
+
+# Packages needed for the build
+RUN pacman --noconfirm -Sy \
+    base-devel \
+    gcc \
+    git
+
+RUN pacman --noconfirm -Sy \
+    riscv64-linux-gnu-gcc
 
 RUN echo $'set background=dark \n\
 set nocompatible        " use vim extensions \n\
@@ -104,8 +67,6 @@ noremap <F7> :set paste!<CR> "' >> /usr/share/vim/vim82/defaults.vim
 RUN sed -i '/^root ALL=(ALL) ALL$/a %sudo ALL=(ALL) NOPASSWD: ALL' /etc/sudoers; \
     echo 'Set disable_coredump false' >> /etc/sudo.conf 
 
-
-USER user
 
 ENV PATH=/opt/riscv/bin/:${PATH}
 SHELL [ "/bin/bash -c" ]
