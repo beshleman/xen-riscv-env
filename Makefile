@@ -15,7 +15,6 @@ else
 endif
 DOCKER_ARGS += $(DOCKER_IMAGE_TAG)
 
-OPENSBI_REV := 6ffe1bed09be1cb2db8755b30c0258849184400b
 CLONED_DEPS := xen/.cloned opensbi/.cloned linux/.cloned u-boot/.cloned
 
 CROSS_COMPILE := riscv64-linux-gnu-
@@ -75,7 +74,6 @@ xen/.cloned:
 
 opensbi/.cloned:
 	git clone https://github.com/riscv/opensbi.git
-	cd opensbi && git reset --hard $(OPENSBI_REV)
 	touch $@
 
 linux/.cloned:
